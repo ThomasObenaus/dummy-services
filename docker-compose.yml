@@ -1,0 +1,57 @@
+version: "3"
+services:
+  s1:
+    image: thobe/ping_service:0.0.4
+    environment:
+      - SERVICE_NAME=s1
+      - PROVIDER_ADDR=s2:8080
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "80:8080"
+    networks:
+      - webnet
+    healthcheck:
+      test: ["CMD", "wget", "-O -", "http://localhost:8080/ping"]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+  s2:
+    image: thobe/ping_service:0.0.4
+    environment:
+      - SERVICE_NAME=s2
+      - PROVIDER_ADDR=s3:8080
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "81:8080"
+    networks:
+      - webnet
+    healthcheck:
+      test: ["CMD", "wget", "-O -", "http://localhost:8080/ping"]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+  s3:
+    image: thobe/ping_service:0.0.4
+    environment:
+      - SERVICE_NAME=s3
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "82:8080"
+    networks:
+      - webnet
+    healthcheck:
+      test: ["CMD", "wget", "-O -", "http://localhost:8080/ping"]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+networks:
+  webnet:
