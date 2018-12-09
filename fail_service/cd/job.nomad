@@ -11,7 +11,7 @@ job "fail-service" {
     task "fail-service" {
       driver = "docker"
       config {
-        image = "<aws-account-id>.dkr.ecr.us-east-1.amazonaws.com/service/fail_service:2018-12-09_16-42-52_0ec3263_dirty"
+        image = "<aws-account-id>.dkr.ecr.us-east-1.amazonaws.com/service/fail_service:2018-12-09_22-14-45_22f3e74_dirty"
         port_map = {
           http = 8080
         }
@@ -29,6 +29,12 @@ job "fail-service" {
           interval = "10s"
           timeout  = "2s"
         }
+      }
+
+      env {
+        HEALTHY_IN    = 20,
+        HEALTHY_FOR   = 50,
+        UNHEALTHY_FOR = 100,
       }
 
       resources {
