@@ -6,5 +6,4 @@ jobs:
     working_directory: /go/src/github.com/thomasobenaus/dummy-services
     steps:
       - checkout
-      - run: cd ping_service
-      - run: make all
+      - run: cd ping_service && make all
