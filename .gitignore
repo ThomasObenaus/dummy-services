@@ -1,4 +1,4 @@
 vendor/
 Gopkg.lock
-ping-service
+ping_service/ping_service
 version
