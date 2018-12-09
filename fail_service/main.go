@@ -15,6 +15,8 @@ func main() {
 	var localPort = flag.Int("p", 8080, "The port where the application instance listens to. Defaults to 8080.")
 	flag.Parse()
 
+	http.HandleFunc("/health", healthHandler)
+
 	//start the web server
 	log.Printf("Starts listening at %d.\n", *localPort)
 

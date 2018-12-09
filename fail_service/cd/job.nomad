@@ -14,12 +14,24 @@ job "fail-service" {
         image = "<aws-account-id>.dkr.ecr.us-east-1.amazonaws.com/service/fail_service:2018-12-09_16-42-52_0ec3263_dirty"
       }
 
+      # Register at consul
+      service {
+        name = "${TASK}"
+        port = "http"
+        check {
+          type     = "http"
+          path     = "/health"
+          interval = "10s"
+          timeout  = "2s"
+        }
+      }
 
       resources {
         cpu    = 100 # MHz
         memory = 256 # MB
         network {
           mbits = 10
+          port "http" {}
         }
       }
     }
