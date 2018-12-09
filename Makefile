@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := all
 docker_hub_namespace := thobe
-name        := ping-service
+name        := ping_service
 
 ################################################################################################################
 # NOTE: The following lines can keep untouched. There is nothing more to configure the docker_hub_namespace and the name.  #
