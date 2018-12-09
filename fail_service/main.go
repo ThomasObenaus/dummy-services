@@ -8,14 +8,20 @@ import (
 	"github.com/namsral/flag"
 )
 
-const version = "v1"
-
 func main() {
 
 	var localPort = flag.Int("p", 8080, "The port where the application instance listens to. Defaults to 8080.")
+	var healtyFor = flag.Int("healthy-for", 0, "Number of seconds the health end-point will return a 200. 0 means forever.")
+	//var healtyIn = flag.Int("healthy-in", 0, "Number of seconds the health end-point will return a 200. 0 means forever.")
+	//var unhealtyFor = flag.Int("unhealthy-for", 0, "Number of seconds the health end-point will return a 200. 0 means forever.")
 	flag.Parse()
 
-	http.HandleFunc("/health", healthHandler)
+	log.Println("Cfg:")
+	log.Printf("\thealtyFor: %d", *healtyFor)
+
+	failService := NewFailService()
+
+	http.Handle("/health", &failService)
 
 	//start the web server
 	log.Printf("Starts listening at %d.\n", *localPort)
