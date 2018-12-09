@@ -1,17 +1,10 @@
-.DEFAULT_GOAL				:= all
-category    := service
+.DEFAULT_GOAL := all
+docker_hub_namespace := thobe
 name        := ping-service
-aws_reg     := eu-central-1
-aws_profile := playground
 
 ################################################################################################################
-# NOTE: The following lines can keep untouched. There is nothing more to configure the category and the name.  #
+# NOTE: The following lines can keep untouched. There is nothing more to configure the docker_hub_namespace and the name.  #
 #################################################################################################################
-
-# obtain aws account id
-aws_aid     := $(shell aws sts get-caller-identity --output text --query 'Account' --profile $(aws_profile))
-
-ecr_url  := $(aws_aid).dkr.ecr.$(aws_reg).amazonaws.com
 
 # Create version tag from git commit message. Indicate if there are uncommited local changes.
 date := $(shell date '+%Y-%m-%d_%H-%M-%S')
@@ -19,11 +12,9 @@ rev  := $(shell git rev-parse --short HEAD)
 flag := $(shell git diff-index --quiet HEAD -- || echo "_dirty";)
 tag  := $(date)_$(rev)$(flag)
 
-# Create credentials for Docker for AWS ecr login
-creds := $(shell aws ecr get-login --no-include-email --region $(aws_reg) --profile $(aws_profile))
 
 all: vendor test build finish
-all-docker: clean vendor test docker push finish
+docker: clean version docker.build docker.push finish
 
 test:
 	@echo "----------------------------------------------------------------------------------"
@@ -61,23 +52,19 @@ run: build
 	@echo "--> Run ${name}"
 	@./${name}
 
-
 version: delim
 	@echo "[INFO] Building version:"
 	@echo "$(tag)" | tee version
 
-credentials: delim
-	@echo "[INFO] Login to AWS ECR"
-	@$(creds)
-
-docker: delim
+docker.build: delim
 	@echo "[INFO] Building and tagging image"
-	docker build -t $(category)/$(name) --build-arg VERSION=$(tag) .
-	@docker tag $(category)/$(name):latest $(ecr_url)/$(category)/$(name):$(tag)
+	@docker build -t $(docker_hub_namespace)/$(name) --build-arg VERSION=$(tag) .
+	@docker tag $(docker_hub_namespace)/$(name):latest $(docker_hub_namespace)/$(name):$(tag)
 
-push: credentials delim
-	@echo "[INFO] Pushing image to AWS ECR"
-	@docker push $(ecr_url)/$(category)/$(name):$(tag)
+docker.push: delim
+	@echo "[INFO] Pushing image to Docker HUB"
+	@docker login
+	@docker push $(docker_hub_namespace)/$(name):$(tag)
 
 delim:
 	@echo "------------------------------------------------------------------------------------------------"

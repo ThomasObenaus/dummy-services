@@ -1,3 +1,4 @@
 vendor/
 Gopkg.lock
 ping-service
+version
