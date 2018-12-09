@@ -3,7 +3,8 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.10.3
-    working_directory: /go/src/github.com/thomasobenaus/ping-service
+    working_directory: /go/src/github.com/thomasobenaus/dummy-services
     steps:
       - checkout
+      - run: cd ping_service
       - run: make all
