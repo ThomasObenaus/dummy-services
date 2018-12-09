@@ -61,7 +61,7 @@ clean:
 run: build
 	@echo "----------------------------------------------------------------------------------"
 	@echo "--> Run ${name}"
-	@./${name}
+	@./${name} --healthy-for 20 --healthy-in 10 --unhealthy-for 10
 
 version: delim
 	@echo "[INFO] Building version:"
