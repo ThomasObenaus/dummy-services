@@ -1,4 +1,5 @@
 vendor/
 Gopkg.lock
+fail_service/fail_service
 ping_service/ping_service
 version

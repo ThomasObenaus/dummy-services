@@ -7,3 +7,4 @@ jobs:
     steps:
       - checkout
       - run: cd ping_service && make all
+      - run: cd fail_service && make all
