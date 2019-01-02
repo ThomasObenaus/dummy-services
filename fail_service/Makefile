@@ -58,15 +58,10 @@ depend.install:
 clean:
 	@rm -f version
 
-start-consul:
-	@echo "----------------------------------------------------------------------------------"
-	@echo "--> Starting Consul locally"
-	@consul agent -dev
-
 run: build
 	@echo "----------------------------------------------------------------------------------"
 	@echo "--> Run ${name}"
-	@./${name} --healthy-for 20 --healthy-in 10 --unhealthy-for 10 --restarts-to-get-healthy 5 --consul-server-addr "localhost:8500"
+	@./${name} --healthy-for 20 --healthy-in 10 --unhealthy-for 10
 
 version: delim
 	@echo "[INFO] Building version:"
