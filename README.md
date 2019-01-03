@@ -4,5 +4,5 @@
 
 ## Services
 
-- [ping_service](ping_service/)
-- [fail_service](fail_service/)
+- [ping_service](ping_service/) ... For testing service-discovery.
+- [fail_service](fail_service/) ... For testing health, restart, migration and rollback mechanisms and deployment patterns.
