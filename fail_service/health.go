@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+// FailService is a simple interface for a service that implements 3 endpoints
+// The /health EP responds with the health status of the service
+// The /sethealthy EP switches the health state of the service to healthy
+// The /setunhealthy EP switches the health state of the service to unhealthy
 type FailService interface {
 	HealthEndpointHandler(w http.ResponseWriter, r *http.Request)
 	SetHealthyEndpointHandler(w http.ResponseWriter, r *http.Request)
@@ -29,7 +33,7 @@ type failServiceImpl struct {
 
 func validateHTTPMethod(w http.ResponseWriter, r *http.Request) bool {
 	if r.Method != http.MethodPut {
-		w.Header().Set("Content-Type", "applicaton/json")
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write(errorResponseWrongMethod)
 		return false
