@@ -1,7 +1,8 @@
 job "fail-service" {
-  datacenters = ["public-services"]
+  datacenters = ["testing"]
 
   type = "service"
+
   update {
     stagger = "5s"
     max_parallel = 1
@@ -11,7 +12,7 @@ job "fail-service" {
     task "fail-service" {
       driver = "docker"
       config {
-        image = "<aws-account-id>.dkr.ecr.us-east-1.amazonaws.com/service/fail_service:2018-12-09_22-14-45_22f3e74_dirty"
+        image = "thobe/fail_service:latest"
         port_map = {
           http = 8080
         }
@@ -32,9 +33,9 @@ job "fail-service" {
       }
 
       env {
-        HEALTHY_IN    = 20,
-        HEALTHY_FOR   = 50,
-        UNHEALTHY_FOR = 100,
+        HEALTHY_IN    = 0,
+        HEALTHY_FOR   = 0,
+        UNHEALTHY_FOR = 0,
       }
 
       resources {
