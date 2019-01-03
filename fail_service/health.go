@@ -85,7 +85,7 @@ func (fs *failServiceImpl) Start() {
 
 	fs.ticker = time.NewTicker(time.Millisecond * 1000)
 	go func() {
-		for _ = range fs.ticker.C {
+		for range fs.ticker.C {
 
 			if !fs.overwrittenByEndpoint {
 				currentTime := time.Now().Unix()
