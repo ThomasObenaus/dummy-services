@@ -24,6 +24,15 @@ To just build and then run it with custom parameters you just call `make build`.
 
 To start it you just call it with the correct parameters. I.e. `./fail_service -healthy-in=10`
 
+## Build docker and push it to Docker Hub
+
+- `make docker` will build the docker image and push it to Docker Hub
+
+## Deploy it to Nomad
+
+- Adjust file `cd/job.nomad` by setting the variable `datacenters = ["testing"]` to the data center of your nomad cluster.
+- Deploy it via `nomad run cd/job.nomad`
+
 ## Command Line Interface
 
 ```bash
