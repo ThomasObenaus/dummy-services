@@ -146,10 +146,11 @@ func (fs *failServiceImpl) nextEvalStateChange(currentTime int64) int64 {
 	return currentTime + fs.unHealthyFor
 }
 
+// NewFailService creates a new instance of a FailService implementation
 func NewFailService(healthyIn int64, healthyFor int64, unHealthyFor int64) FailService {
 
 	healthy := false
-	// immedately start healthy
+	// immediately start healthy
 	if healthyIn == 0 {
 		healthy = true
 	}

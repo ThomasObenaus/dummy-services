@@ -25,7 +25,7 @@ type client struct {
 	consul *consul.Client
 }
 
-//NewConsul returns a Client interface for given consul address
+//NewConsulClient returns a Client interface for given consul address
 func NewConsulClient(addr string) (Client, error) {
 	rand.Seed(time.Now().UTC().UnixNano())
 

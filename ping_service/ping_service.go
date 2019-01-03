@@ -14,6 +14,7 @@ type pingResponse struct {
 	Version string `json:"version"`
 }
 
+// PingService the service/ handler implementation of the ping-service
 type PingService struct {
 	Name         string
 	Version      string
