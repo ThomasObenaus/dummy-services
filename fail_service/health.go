@@ -7,22 +7,57 @@ import (
 )
 
 type FailService interface {
-	ServeHTTP(w http.ResponseWriter, r *http.Request)
+	HealthEndpointHandler(w http.ResponseWriter, r *http.Request)
+	SetHealthyEndpointHandler(w http.ResponseWriter, r *http.Request)
+	SetUnHealthyEndpointHandler(w http.ResponseWriter, r *http.Request)
 	Start()
 	Stop()
 }
 
+var errorResponseWrongMethod = []byte("{ \"error\": \"Invalid mehtod used. You have to use the PUT mehtod.\" }")
+
 type failServiceImpl struct {
-	healthyFor     int64
-	healthyIn      int64
-	unHealthyFor   int64
-	ticker         *time.Ticker
-	healthy        bool
-	changeStateAt  int64
-	wasHealthyOnce bool
+	healthyFor            int64
+	healthyIn             int64
+	unHealthyFor          int64
+	ticker                *time.Ticker
+	healthy               bool
+	changeStateAt         int64
+	wasHealthyOnce        bool
+	overwrittenByEndpoint bool
 }
 
-func (fs *failServiceImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func validateHTTPMethod(w http.ResponseWriter, r *http.Request) bool {
+	if r.Method != http.MethodPut {
+		w.Header().Set("Content-Type", "applicaton/json")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(errorResponseWrongMethod)
+		return false
+	}
+
+	return true
+}
+
+func (fs *failServiceImpl) SetHealthyEndpointHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("SetHealthyEndpointHandler called")
+
+	if validateHTTPMethod(w, r) {
+		fs.overwrittenByEndpoint = true
+		fs.healthy = true
+	}
+}
+
+func (fs *failServiceImpl) SetUnHealthyEndpointHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("SetUnHealthyEndpointHandler called")
+
+	if validateHTTPMethod(w, r) {
+		fs.overwrittenByEndpoint = true
+		fs.healthy = false
+	}
+}
+
+func (fs *failServiceImpl) HealthEndpointHandler(w http.ResponseWriter, r *http.Request) {
+	log.Println("HealthEndpointHandler called")
 
 	if fs.healthy {
 		w.WriteHeader(http.StatusOK)
@@ -35,6 +70,14 @@ func (fs *failServiceImpl) Stop() {
 	fs.ticker.Stop()
 }
 
+func stateToStr(healthy bool) string {
+	state := "healthy"
+	if !healthy {
+		state = "unhealthy"
+	}
+	return state
+}
+
 func (fs *failServiceImpl) Start() {
 
 	currentTime := time.Now().Unix()
@@ -44,20 +87,22 @@ func (fs *failServiceImpl) Start() {
 	go func() {
 		for _ = range fs.ticker.C {
 
-			currentTime := time.Now().Unix()
-			if fs.isChangeState(currentTime) {
-				fs.switchHealthy()
-				fs.changeStateAt = fs.nextEvalStateChange(currentTime)
+			if !fs.overwrittenByEndpoint {
+				currentTime := time.Now().Unix()
+				if fs.isChangeState(currentTime) {
+					fs.switchHealthy()
+					fs.changeStateAt = fs.nextEvalStateChange(currentTime)
 
-				log.Printf("State changed")
-				log.Printf("Next state change at %s", time.Unix(fs.changeStateAt, 0).String())
+					log.Printf("State changed")
+					log.Printf("Next state change at %s", time.Unix(fs.changeStateAt, 0).String())
+				}
 			}
 
-			state := "healthy"
-			if !fs.healthy {
-				state = "unhealthy"
+			overwrittenByEndpointStr := ""
+			if fs.overwrittenByEndpoint {
+				overwrittenByEndpointStr = " - Was set and thus fixed by endpoint."
 			}
-			log.Printf("State %s", state)
+			log.Printf("State %s %s", stateToStr(fs.healthy), overwrittenByEndpointStr)
 		}
 	}()
 }
@@ -106,12 +151,13 @@ func NewFailService(healthyIn int64, healthyFor int64, unHealthyFor int64) FailS
 	}
 
 	result := &failServiceImpl{
-		healthyIn:      healthyIn,
-		healthyFor:     healthyFor,
-		unHealthyFor:   unHealthyFor,
-		healthy:        healthy,
-		wasHealthyOnce: healthy,
-		changeStateAt:  0,
+		healthyIn:             healthyIn,
+		healthyFor:            healthyFor,
+		unHealthyFor:          unHealthyFor,
+		healthy:               healthy,
+		wasHealthyOnce:        healthy,
+		changeStateAt:         0,
+		overwrittenByEndpoint: false,
 	}
 
 	return result

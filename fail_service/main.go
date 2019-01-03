@@ -22,7 +22,9 @@ func main() {
 	log.Printf("\tunhealthyFor: %d", *unhealthyFor)
 
 	failService := NewFailService(int64(*healthyIn), int64(*healthyFor), int64(*unhealthyFor))
-	http.Handle("/health", failService)
+	http.HandleFunc("/health", failService.HealthEndpointHandler)
+	http.HandleFunc("/sethealthy", failService.SetHealthyEndpointHandler)
+	http.HandleFunc("/setunhealthy", failService.SetUnHealthyEndpointHandler)
 	failService.Start()
 
 	//start the web server
