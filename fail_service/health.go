@@ -137,9 +137,15 @@ func (fs *failServiceImpl) nextEvalStateChange(currentTime int64) int64 {
 		return currentTime + fs.healthyFor
 	}
 
+	// in case healthyIn is -1 or negative at all
+	healthyIn := fs.healthyIn
+	if healthyIn < 0 {
+		healthyIn = 0
+	}
+
 	// currently not healthy + were never healthy before ... initially get healthy
 	if !fs.wasHealthyOnce {
-		return currentTime + fs.healthyIn
+		return currentTime + healthyIn
 	}
 
 	// currently not healthy ... stay unhealthy for ...

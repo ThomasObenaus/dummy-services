@@ -59,6 +59,9 @@ Usage of ./fail_service:
 # Gets healthy in 10s, then after 20s it gets unhealthy. For 3s it stays unhealthy
 # and gets healthy again to stay so for 20s. etc.
 ./fail_service -healthy-in=10 -healthy-for=20 -unhealthy-for=3
+
+# Service will stay unhealthy forever
+./fail_service -healthy-in=-1
 ```
 
 ## Overwrite State via HTTP Call
