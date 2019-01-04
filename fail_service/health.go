@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"time"
@@ -19,6 +20,11 @@ type FailService interface {
 }
 
 var errorResponseWrongMethod = []byte("{ \"error\": \"Invalid mehtod used. You have to use the PUT mehtod.\" }")
+
+type healthResponse struct {
+	Message string `json:"message"`
+	Ok      bool   `json:"ok"`
+}
 
 type failServiceImpl struct {
 	healthyFor            int64
@@ -63,10 +69,23 @@ func (fs *failServiceImpl) SetUnHealthyEndpointHandler(w http.ResponseWriter, r 
 func (fs *failServiceImpl) HealthEndpointHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("HealthEndpointHandler called")
 
+	healthResponse := healthResponse{
+		Message: "Ok",
+		Ok:      true,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	if fs.healthy {
 		w.WriteHeader(http.StatusOK)
 	} else {
 		w.WriteHeader(http.StatusGatewayTimeout)
+		healthResponse.Ok = false
+		healthResponse.Message = "Error"
+	}
+
+	err := json.NewEncoder(w).Encode(healthResponse)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
 
