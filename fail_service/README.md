@@ -37,10 +37,10 @@ To start it you just call it with the correct parameters. I.e. `./fail_service -
 
 ```bash
 Usage of ./fail_service:
-  -healthy-for=0: Number of seconds the health end-point will return a 200. 0 means forever.
-  -healthy-in=0: Number of seconds the health end-point will start returning a 200.
+  -healthy-for=0: Number of seconds the health end-point will return a 200. A -1 will result in the service staying healthy forever.
+  -healthy-in=0: Number of seconds the health end-point will start returning a 200. A -1 will result in the service NEVER getting healthy.
   -p=8080: The port where the application instance listens to. Defaults to 8080.
-  -unhealthy-for=0: Number of seconds the health end-point will keep returning a !200.
+  -unhealthy-for=0: Number of seconds the health end-point will keep returning a !200. A -1 will result in the service staying unhealthy forever.
 ```
 
 ### Examples
@@ -50,7 +50,7 @@ Usage of ./fail_service:
 ./fail_service
 
 # Gets healthy in 10s and stays healthy
-./fail_service -healthy-in=10
+./fail_service -healthy-in=10 -healthy-for=-1
 
 # Starts healthy, then after 20s it gets unhealthy. For 3s it stays unhealthy
 # and gets healthy again to stay so for 20s. etc.
@@ -62,6 +62,24 @@ Usage of ./fail_service:
 
 # Service will stay unhealthy forever
 ./fail_service -healthy-in=-1
+
+# Service will stay healthy forever
+./fail_service -healthy-for=-1
+
+# Gets healthy in 10s, then after 20s it gets unhealthy and then stays unhealthy forever.
+./fail_service -healthy-in=10 -healthy-for=20 -unhealthy-for=-1
+
+# The parameter value -1 means unlimited for all 3 parameters. If multiple of them are set
+# to -1 at the same time they are prioritized by -healthy-for, then -healthy-in and then -unhealthy-for.
+
+# Thus the following example will stay unhealthy forever.
+./fail_service -healthy-in=-1 -healthy-for=-1 -unhealthy-for=-1
+
+# Thus the following example will stay healthy forever.
+./fail_service -healthy-in=0 -healthy-for=-1 -unhealthy-for=-1
+
+# Thus the following example will get healthy immediately and stay for 10s and then gets unhealthy forever.
+./fail_service -healthy-in=0 -healthy-for=10 -unhealthy-for=-1
 ```
 
 ## Overwrite State via HTTP Call

@@ -139,10 +139,6 @@ func (fs *failServiceImpl) switchHealthy() {
 
 func (fs *failServiceImpl) isChangeState(currentTime int64) bool {
 
-	if fs.healthy && fs.healthyFor == 0 {
-		return false
-	}
-
 	if currentTime > fs.changeStateAt {
 		return true
 	}
