@@ -1,7 +1,6 @@
 # Fail-Service
 
-This is a small service for testing purposes. The only thin it can do is get healthy or unhealthy.
-Therefore it provides a `/health` endpoint. It reports 200_OK if the service is healthy or 504_GatewayTimeout otherwise.
+The fail-service is a small golang based service for testing purposes. The only feature it offers is getting healthy or unhealthy. The provided `/health` endpoint can be used to check the state. It reports 200_OK if the service is healthy or 504_GatewayTimeout otherwise.
 
 The service state can be influenced via command line parameters or by sending a request to the `/sethealthy` or `/setunhealthy` endpoint.
 
@@ -47,7 +46,7 @@ Usage of ./fail_service:
 
 ```bash
 # Starts healthy and stays healthy
-./fail_service
+./fail_service -healthy-for=-1
 
 # Gets healthy in 10s and stays healthy
 ./fail_service -healthy-in=10 -healthy-for=-1
@@ -62,9 +61,6 @@ Usage of ./fail_service:
 
 # Service will stay unhealthy forever
 ./fail_service -healthy-in=-1
-
-# Service will stay healthy forever
-./fail_service -healthy-for=-1
 
 # Gets healthy in 10s, then after 20s it gets unhealthy and then stays unhealthy forever.
 ./fail_service -healthy-in=10 -healthy-for=20 -unhealthy-for=-1
