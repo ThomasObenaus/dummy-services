@@ -6,11 +6,10 @@ name        := fail_service
 # NOTE: The following lines can keep untouched. There is nothing more to configure the docker_hub_namespace and the name.  #
 #################################################################################################################
 
-# Create version tag from git commit message. Indicate if there are uncommited local changes.
-date := $(shell date '+%Y-%m-%d_%H-%M-%S')
-rev  := $(shell git rev-parse --short HEAD)
+# Create version tag from git tag. Indicate if there are uncommited local changes.
 flag := $(shell git diff-index --quiet HEAD -- || echo "_dirty";)
-tag  := $(date)_$(rev)$(flag)
+git_tag := $(shell git describe --tags)
+tag  := $(git_tag)$(flag)
 
 all: test build finish
 docker: clean docker.build docker.push finish
@@ -28,12 +27,12 @@ test: ## Runs the unittests
 #-----------------
 #-- build
 #-----------------
-build: ## builds the fail service
+build: ## builds the fail-service
 	@echo "----------------------------------------------------------------------------------"
 	@echo "--> Build the $(name)"
 	@go build -o $(name) .
 
-run: build ## runs the fail service
+run: build ## runs the fail-service
 	@echo "----------------------------------------------------------------------------------"
 	@echo "--> Run ${name}"
 	@./${name} --healthy-for 20 --healthy-in 10 --unhealthy-for 10
@@ -42,12 +41,12 @@ version: delim ## creates the version file
 	@echo "[INFO] Creating version file: $(tag)";
 	@echo "$(tag)" > version
 
-docker.build: delim version ## builds the docker image of the fail service
+docker.build: delim version ## builds the docker image of the fail-service
 	@echo "[INFO] Building and tagging image as $(docker_hub_namespace)/$(name):$(tag) and :latest"
 	@docker build -t $(docker_hub_namespace)/$(name) --build-arg VERSION=$(tag) .
 	@docker tag $(docker_hub_namespace)/$(name):latest $(docker_hub_namespace)/$(name):$(tag)
 
-docker.push: delim ## pushes the docker image of the fail service
+docker.push: delim ## pushes the docker image of the fail-service
 	@echo "[INFO] Pushing image to Docker HUB one tagged as latest and one tagged with version :$(tag)"
 	@docker login
 	@docker push $(docker_hub_namespace)/$(name):$(tag)

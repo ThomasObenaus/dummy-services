@@ -6,12 +6,10 @@ name        := ping_service
 # NOTE: The following lines can keep untouched. There is nothing more to configure the docker_hub_namespace and the name.  #
 #################################################################################################################
 
-# Create version tag from git commit message. Indicate if there are uncommited local changes.
-date := $(shell date '+%Y-%m-%d_%H-%M-%S')
-rev  := $(shell git rev-parse --short HEAD)
+# Create version tag from git tag. Indicate if there are uncommited local changes.
 flag := $(shell git diff-index --quiet HEAD -- || echo "_dirty";)
-tag  := $(date)_$(rev)$(flag)
-
+git_tag := $(shell git describe --tags)
+tag  := $(git_tag)$(flag)
 
 all: test build finish
 docker: clean docker.build docker.push finish
