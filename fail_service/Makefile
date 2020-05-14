@@ -53,6 +53,9 @@ docker.push: delim ## pushes the docker image of the fail service
 	@docker push $(docker_hub_namespace)/$(name):$(tag)
 	@docker push $(docker_hub_namespace)/$(name):latest
 
+clean:
+	@rm -f version
+
 delim:
 	@echo "------------------------------------------------------------------------------------------------"
 

@@ -6,13 +6,7 @@ RUN set -ex &&\
   apk update &&\ 
   apk add --no-cache git
 
-# set up go dep
-RUN go get -u github.com/golang/dep/cmd/dep
-
-COPY Gopkg.lock Gopkg.toml /go/src/ping_service/
 WORKDIR /go/src/ping_service/
-# Install library dependencies
-RUN dep ensure -vendor-only
 
 # copy ping_service files and build the ping_service
 COPY . /go/src/ping_service/
