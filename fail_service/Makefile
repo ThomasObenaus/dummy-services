@@ -12,10 +12,15 @@ rev  := $(shell git rev-parse --short HEAD)
 flag := $(shell git diff-index --quiet HEAD -- || echo "_dirty";)
 tag  := $(date)_$(rev)$(flag)
 
-all: vendor test build finish
-docker: clean version docker.build docker.push finish
+all: test build finish
+docker: clean docker.build docker.push finish
 
-test:
+# This target (taken from: https://gist.github.com/prwhite/8168133) is an easy way to print out a usage/ help of all make targets.
+# For all make targets the text after \#\# will be printed.
+help: ## Prints the help
+	@echo "$$(grep -hE '^\S+:.*##' $(MAKEFILE_LIST) | sed -e 's/:.*##\s*/:/' -e 's/^\(.\+\):\(.*\)/\1\:\2/' | column -c2 -t -s :)"
+
+test: ## Runs the unittests
 	@echo "----------------------------------------------------------------------------------"
 	@echo "--> Run the unit-tests"
 	@go test  -v
@@ -23,44 +28,26 @@ test:
 #-----------------
 #-- build
 #-----------------
-build:
+build: ## builds the fail service
 	@echo "----------------------------------------------------------------------------------"
 	@echo "--> Build the $(name)"
 	@go build -o $(name) .
 
-#------------------
-#-- dependencies
-#------------------
-vendor: depend.install depend.update
-
-depend.update:
-	@echo "----------------------------------------------------------------------------------"
-	@echo "--> updating dependencies from Gopkg.lock"
-	@dep ensure -update -v
-
-depend.install:
-	@echo "----------------------------------------------------------------------------------"
-	@echo "--> install dependencies as listed in Gopkg.toml"
-	@dep ensure -v
-
-clean:
-	@rm -f version
-
-run: build
+run: build ## runs the fail service
 	@echo "----------------------------------------------------------------------------------"
 	@echo "--> Run ${name}"
 	@./${name} --healthy-for 20 --healthy-in 10 --unhealthy-for 10
 
-version: delim
+version: delim ## creates the version file
 	@echo "[INFO] Creating version file: $(tag)";
 	@echo "$(tag)" > version
 
-docker.build: delim
+docker.build: delim version ## builds the docker image of the fail service
 	@echo "[INFO] Building and tagging image as $(docker_hub_namespace)/$(name):$(tag) and :latest"
 	@docker build -t $(docker_hub_namespace)/$(name) --build-arg VERSION=$(tag) .
 	@docker tag $(docker_hub_namespace)/$(name):latest $(docker_hub_namespace)/$(name):$(tag)
 
-docker.push: delim
+docker.push: delim ## pushes the docker image of the fail service
 	@echo "[INFO] Pushing image to Docker HUB one tagged as latest and one tagged with version :$(tag)"
 	@docker login
 	@docker push $(docker_hub_namespace)/$(name):$(tag)

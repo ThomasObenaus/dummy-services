@@ -91,3 +91,9 @@ curl -X PUT localhost:8080/sethealthy
 # Set the service unhealthy
 curl -X PUT localhost:8080/setunhealthy
 ```
+
+## HTTP Endpoint for Health
+
+```bash
+curl -X GET localhost:8080/health
+```
