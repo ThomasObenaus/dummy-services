@@ -16,3 +16,6 @@ jobs:
 
       - name: Build + Test fail_service
         run: cd fail_service && make all
+
+      - name: Build + Test ping_service
+        run: cd ping_service && make all
