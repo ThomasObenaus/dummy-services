@@ -46,8 +46,8 @@ version: delim ## creates the version file
 
 docker.build: delim version ## builds the docker image of the ping-service
 	@echo "[INFO] Building and tagging image as $(docker_hub_namespace)/$(name):$(tag) and :latest"
-	#@docker build -t $(docker_hub_namespace)/$(name) --build-arg VERSION=$(tag) .
-	#@docker tag $(docker_hub_namespace)/$(name):latest $(docker_hub_namespace)/$(name):$(tag)
+	@docker build -t $(docker_hub_namespace)/$(name) --build-arg VERSION=$(tag) .
+	@docker tag $(docker_hub_namespace)/$(name):latest $(docker_hub_namespace)/$(name):$(tag)
 
 docker.push: delim ## pushes the docker image of the fail-service
 	@echo "[INFO] Pushing image to Docker HUB one tagged as latest and one tagged with version :$(tag)"
