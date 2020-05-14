@@ -8,7 +8,7 @@ name        := ping_service
 
 # Create version tag from git tag. Indicate if there are uncommited local changes.
 flag := $(shell git diff-index --quiet HEAD -- || echo "_dirty";)
-git_tag := $(shell git describe --tags)
+git_tag := $(shell git describe --tags -- || echo "0.0.0";)
 tag  := $(git_tag)$(flag)
 
 all: test build finish
@@ -46,8 +46,8 @@ version: delim ## creates the version file
 
 docker.build: delim version ## builds the docker image of the ping-service
 	@echo "[INFO] Building and tagging image as $(docker_hub_namespace)/$(name):$(tag) and :latest"
-	@docker build -t $(docker_hub_namespace)/$(name) --build-arg VERSION=$(tag) .
-	@docker tag $(docker_hub_namespace)/$(name):latest $(docker_hub_namespace)/$(name):$(tag)
+	#@docker build -t $(docker_hub_namespace)/$(name) --build-arg VERSION=$(tag) .
+	#@docker tag $(docker_hub_namespace)/$(name):latest $(docker_hub_namespace)/$(name):$(tag)
 
 docker.push: delim ## pushes the docker image of the fail-service
 	@echo "[INFO] Pushing image to Docker HUB one tagged as latest and one tagged with version :$(tag)"
