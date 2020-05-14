@@ -8,7 +8,7 @@ name        := ping_service
 
 # Create version tag from git tag. Indicate if there are uncommited local changes.
 flag := $(shell git diff-index --quiet HEAD -- || echo "_dirty";)
-git_tag := $(shell git describe --tags -- || echo "0.0.0";)
+git_tag := $(shell git describe --tags -- || echo "v0.0.0";)
 tag  := $(git_tag)$(flag)
 
 all: test build finish
